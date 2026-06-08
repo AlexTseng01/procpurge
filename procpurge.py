@@ -1,4 +1,6 @@
 import psutil
+import sys
+import argparse
 
 # Appends a process to the process list
 def append_proc(process):
@@ -27,11 +29,31 @@ def purge():
                 if process_name:
                     if any(target in process_name.lower() for target in target_processes):
                         process.kill()
-                        print(f"Ended {process}.")
+                        print(f"Ended {process_name}")
 
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
 
+def main(command, name):
+    ACTION_MAP = {
+        "add": append_proc,
+        "remove": remove_proc,
+        "purge": purge
+    }
+
+    action_name = ACTION_MAP[command]
+
+    if command == "purge":
+        action_name()
+    else:
+        if not name:
+            print(f"Error: '{command}' requires a process name parameter")
+            sys.exit(1)
+        action_name(name)
 
 if __name__ == "__main__":
-    purge()
+    parser = argparse.ArgumentParser(description="ProcPurge")
+    parser.add_argument("command", choices=["add", "remove", "purge"], help="Actions to execute")
+    parser.add_argument("name", nargs="?", default=None, help="Process target name")
+    args = parser.parse_args()
+    main(args.command, args.name)
