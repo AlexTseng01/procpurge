@@ -28,7 +28,9 @@ It uses partial strings to accurately match process names to their sub-processes
 
 4. ```python procpurge.py remove steam```
 
-5. ```python procpurge.py purge```## 🛠️ Command Line Options
+5. ```python procpurge.py purge```
+
+## 🛠️ Command Line Options
 
 ProcPurge accepts two positional arguments from the terminal: `command` and `name`.
 
