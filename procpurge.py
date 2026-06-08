@@ -34,6 +34,7 @@ def purge():
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
 
+# Main
 def main(command, name):
     ACTION_MAP = {
         "add": append_proc,
@@ -51,6 +52,7 @@ def main(command, name):
             sys.exit(1)
         action_name(name)
 
+# Parser
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ProcPurge")
     parser.add_argument("command", choices=["add", "remove", "purge"], help="Actions to execute")
