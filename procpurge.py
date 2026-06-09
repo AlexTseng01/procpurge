@@ -7,8 +7,14 @@ import argparse
 
 # Adds a process to the purge list
 def add_proc(process):
+    with open("protected.txt", "r") as file:
+        if process in file.read().splitlines():
+            print(f"'{process}' is protected")
+            return
+        
     with open("processes.txt", "r") as file:
         if process in file.read().splitlines():
+            print(f"'{process}' already exists in the purge list")
             return
 
     with open("processes.txt", "a") as file:
@@ -31,6 +37,7 @@ def remove_proc(process):
 def lock_proc(process):
     with open("protected.txt", "r") as file:
         if process in file.read().splitlines():
+            print(f"'{process}' already exists in the protected list")
             return
     
     with open("protected.txt", "a") as file:
