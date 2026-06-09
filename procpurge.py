@@ -41,8 +41,8 @@ def list_actions():
     print(
         "add\n" + 
         "remove\n" + 
-        "list_processes\n" + 
-        "list_actions\n" + 
+        "processes\n" + 
+        "actions\n" + 
         "purge"
     )
 
