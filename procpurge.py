@@ -1,9 +1,5 @@
 # FUTURE ADDONS:
 # 3. Command: autostart (basically autostarts upon computer reboot)
-# 5. Protected tasks for, you know, avoid being terminated, lol.
-# 6. Command: lock/unlock process, which basically adds or removes a process from the protected tasks list 
-# 7. append_proc should be able to take multiple arguments
-# 8. remove_proc should be able to take multiple arguments
 
 import psutil
 import sys
@@ -21,6 +17,9 @@ def add_proc(process):
 # Removes a process from the purge list
 def remove_proc(process):
     with open("processes.txt", "r") as file:
+        if process not in file.read().splitlines():
+            print(f"'{process}' not found")
+            return
         lines = file.readlines()
 
     with open("processes.txt", "w") as file:
@@ -40,6 +39,9 @@ def lock_proc(process):
 # Removes a process from the protected list
 def unlock_proc(process):
     with open("protected.txt", "r") as file:
+        if process not in file.read().splitlines():
+            print(f"'{process}' not found")
+            return
         lines = file.readlines()
 
     with open("protected.txt", "w") as file:

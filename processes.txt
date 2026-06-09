@@ -1,5 +1,1 @@
 copilot
-ciscocollab
-webexhost
-quantumengine
-xbox
