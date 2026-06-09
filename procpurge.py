@@ -1,6 +1,5 @@
 # FUTURE ADDONS:
 # 3. Command: autostart (basically autostarts upon computer reboot)
-# 4. Guardrails for the purge command since it's too powerful apparently
 # 5. Protected tasks for, you know, avoid being terminated, lol.
 # 6. Command: lock/unlock process, which basically adds or removes a process from the protected tasks list 
 # 7. append_proc should be able to take multiple arguments
@@ -11,7 +10,7 @@ import sys
 import argparse
 
 # Appends a process to the purge list
-def append_proc(process):
+def add_proc(process):
     with open("processes.txt", "a") as file:
         file.write(process + "\n")
 
@@ -24,6 +23,12 @@ def remove_proc(process):
         for line in lines:
             if process != line.strip():
                 file.write(line)
+
+def lock_proc(process):
+    None
+
+def unlock_proc(process):
+    None
 
 # Lists all processes in the purge list
 def list_processes():
@@ -61,16 +66,16 @@ def purge():
 # Main
 def main(command, name):
     ACTION_MAP = {
-        "add": append_proc,
+        "add": add_proc,
         "remove": remove_proc,
-        "list_processes": list_processes,
-        "list_actions": list_actions,
+        "processes": list_processes,
+        "actions": list_actions,
         "purge": purge
     }
 
     action_name = ACTION_MAP[command]
 
-    if command == "purge" or command == "list_processes" or command == "list_actions":
+    if command == "purge" or command == "processes" or command == "actions":
         action_name()
     else:
         if not name:
@@ -81,7 +86,7 @@ def main(command, name):
 # Parser
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ProcPurge")
-    parser.add_argument("command", choices=["add", "remove", "list_processes", "list_actions", "purge"], help="Actions to execute")
+    parser.add_argument("command", choices=["add", "remove", "processes", "actions", "purge"], help="Actions to execute")
     parser.add_argument("name", nargs="?", default=None, help="Process target name")
     args = parser.parse_args()
     main(args.command, args.name)
