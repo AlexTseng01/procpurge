@@ -3,7 +3,7 @@ import sys
 import argparse
 
 # Adds a process PID to the purge list
-def add_proc(pid):
+def add_pid(pid):
     try:
         with open("processes.txt", "r") as file:
             lines = file.read().splitlines()
@@ -18,7 +18,7 @@ def add_proc(pid):
         file.write(pid + "\n")
 
 # Removes a process PID from the purge list
-def remove_proc(pid):
+def remove_pid(pid):
     try:
         with open("processes.txt", "r") as file:
             lines = file.read().splitlines()
@@ -36,8 +36,8 @@ def remove_proc(pid):
     except UnboundLocalError:
         print("The purge list is empty")
 
-# Lists all processes and PID in the purge list
-def list_processes():
+# Lists all PIDs in the purge list
+def list_pid():
     try:
         with open("processes.txt", "r") as file:
             for line in file.readlines():
@@ -55,7 +55,7 @@ def list_actions():
         "purge"
     )
 
-# Purge all processes from the purge list
+# Purge all PIDs from the purge list
 def purge():
     with open("processes.txt", "r") as file:
         target_processes = [line.strip().lower() for line in file if line.strip()]
@@ -75,16 +75,16 @@ def purge():
 # Main
 def main(command, name):
     ACTION_MAP = {
-        "add": add_proc,
-        "remove": remove_proc,
-        "processes": list_processes,
+        "add": add_pid,
+        "remove": remove_pid,
+        "pids": list_pid,
         "actions": list_actions,
         "purge": purge
     }
 
     action_name = ACTION_MAP[command]
 
-    if command == "purge" or command == "processes" or command == "actions":
+    if command == "purge" or command == "pids" or command == "actions":
         action_name()
     else:
         if not name:
@@ -95,7 +95,7 @@ def main(command, name):
 # Parser
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ProcPurge")
-    parser.add_argument("command", choices=["add", "remove", "processes", "actions", "purge"], help="Actions to execute")
+    parser.add_argument("command", choices=["add", "remove", "pids", "actions", "purge"], help="Actions to execute")
     parser.add_argument("name", nargs="?", default=None, help="Process target name")
     args = parser.parse_args()
     main(args.command, args.name)
