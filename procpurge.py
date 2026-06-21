@@ -1,80 +1,61 @@
-# FUTURE ADDONS:
-# 3. Command: autostart (basically autostarts upon computer reboot)
-
 import psutil
 import sys
 import argparse
 
-# Adds a process to the purge list
-def add_proc(process):
-    with open("protected.txt", "r") as file:
-        if process in file.read().splitlines():
-            print(f"'{process}' is protected")
+# Adds a process PID to the purge list
+def add_proc(pid):
+    try:
+        with open("processes.txt", "r") as file:
+            lines = file.read().splitlines()
+    except FileNotFoundError:
+        lines = []
+
+    if pid in lines:
+        print(f"'{pid}' already exists in the purge list")
+        return
+    
+    with open("processes.txt", "a") as file:
+        file.write(pid + "\n")
+
+# Removes a process PID from the purge list
+def remove_proc(pid):
+    try:
+        with open("processes.txt", "r") as file:
+            lines = file.read().splitlines()
+
+        if pid not in lines:
+            print(f"'{pid}' not found")
             return
         
-    with open("processes.txt", "r") as file:
-        if process in file.read().splitlines():
-            print(f"'{process}' already exists in the purge list")
-            return
+        with open("processes.txt", "w") as file:
+            for line in lines:
+                if pid != line:
+                    file.write(line + "\n")
+    except FileNotFoundError:
+        print("The purge list is empty")
+    except UnboundLocalError:
+        print("The purge list is empty")
 
-    with open("processes.txt", "a") as file:
-        file.write(process + "\n")
-
-# Removes a process from the purge list
-def remove_proc(process):
-    with open("processes.txt", "r") as file:
-        if process not in file.read().splitlines():
-            print(f"'{process}' not found")
-            return
-        lines = file.readlines()
-
-    with open("processes.txt", "w") as file:
-        for line in lines:
-            if process != line.strip():
-                file.write(line)
-
-# Adds a process to the protected list
-def lock_proc(process):
-    with open("protected.txt", "r") as file:
-        if process in file.read().splitlines():
-            print(f"'{process}' already exists in the protected list")
-            return
-    
-    with open("protected.txt", "a") as file:
-        file.write(process + "\n")
-
-# Removes a process from the protected list
-def unlock_proc(process):
-    with open("protected.txt", "r") as file:
-        if process not in file.read().splitlines():
-            print(f"'{process}' not found")
-            return
-        lines = file.readlines()
-
-    with open("protected.txt", "w") as file:
-        for line in lines:
-            if process != line.strip():
-                file.write(line)
-
-# Lists all processes in the purge list
+# Lists all processes and PID in the purge list
 def list_processes():
-    with open("processes.txt", "r") as file:
-        for line in file.readlines():
-            print(line.strip())
+    try:
+        with open("processes.txt", "r") as file:
+            for line in file.readlines():
+                print(line.strip())
+    except FileNotFoundError:
+        print("The purge list is empty")
 
-# Lists all processes in the purge list
+# Lists all action commands
 def list_actions():
     print(
         "add\n" + 
         "remove\n" + 
-        "lock\n" + 
-        "unlock\n" +
         "processes\n" + 
         "actions\n" + 
         "purge"
     )
 
-# Purge all tasks from the purge list
+# Purge all processes from the purge list
 def purge():
     with open("processes.txt", "r") as file:
         target_processes = [line.strip().lower() for line in file if line.strip()]
@@ -86,7 +67,7 @@ def purge():
                 if process_name:
                     if any(target in process_name.lower() for target in target_processes):
                         process.kill()
-                        print(f"Ended {process_name}")
+                        print(f"'{process_name}' has been purged")
 
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
@@ -96,8 +77,6 @@ def main(command, name):
     ACTION_MAP = {
         "add": add_proc,
         "remove": remove_proc,
-        "lock": lock_proc,
-        "unlock": unlock_proc,
         "processes": list_processes,
         "actions": list_actions,
         "purge": purge
@@ -116,7 +95,7 @@ def main(command, name):
 # Parser
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ProcPurge")
-    parser.add_argument("command", choices=["add", "remove", "lock", "unlock", "processes", "actions", "purge"], help="Actions to execute")
+    parser.add_argument("command", choices=["add", "remove", "processes", "actions", "purge"], help="Actions to execute")
     parser.add_argument("name", nargs="?", default=None, help="Process target name")
     args = parser.parse_args()
     main(args.command, args.name)
