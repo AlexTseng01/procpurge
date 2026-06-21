@@ -58,17 +58,13 @@ def list_actions():
 # Purge all PIDs from the purge list
 def purge():
     with open("processes.txt", "r") as file:
-        target_processes = [line.strip().lower() for line in file if line.strip()]
+        target_pids = [int(line.strip()) for line in file if line.strip().isdigit()]
         
-        for process in psutil.process_iter(['pid', 'name']):
+        for pid in psutil.process_iter(['pid']):
             try:
-                process_name = process.info['name']
-
-                if process_name:
-                    if any(target in process_name.lower() for target in target_processes):
-                        process.kill()
-                        print(f"'{process_name}' has been purged")
-
+                if pid.info['pid'] in target_pids:
+                    pid.kill()
+                    print(f"Purged pid={pid}")
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
 
